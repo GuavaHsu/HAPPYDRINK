@@ -109,9 +109,7 @@
     const App = () => {
       const [authStatus, setAuthStatus] = React.useState('loading'); 
       const [apiToken, setApiToken] = React.useState("");
-      const [retryCount, setRetryCount] = React.useState(0);
       
-      // ⚠️ 請再次確認此 apiUrl 是否為您的 GAS 部署網址 ⚠️
       const apiUrl = 'https://script.google.com/macros/s/AKfycbylZOr-mY4m822xXNBZgp7uAaeJ_6eT-ZxwZYc9YGNdweiyz5x7l0U8ekSaY9_9MVrP/exec';
 
       React.useEffect(() => {
@@ -125,14 +123,12 @@
         
         let isFinalized = false;
         
-        // 使用全域函數接收結果
         window.onVerifyResult = (res) => {
           if (isFinalized) return;
           isFinalized = true;
           
           if (res && res.auth === 'OK') {
             setApiToken(id);
-            // 延遲 100ms 確保 Token 已寫入再切換介面
             setTimeout(() => setAuthStatus('authorized'), 100);
           } else {
             setAuthStatus('denied');
@@ -145,7 +141,6 @@
           if (s) s.remove();
         };
 
-        // 5秒超時，強制顯示維護畫面（含按鈕）
         const timeoutId = setTimeout(() => {
           if (!isFinalized) {
             isFinalized = true;
@@ -169,7 +164,7 @@
           clearTimeout(timeoutId);
           delete window.onVerifyResult;
         };
-      }, [retryCount]);
+      }, []);
 
       const getTodayString = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; };
       const [fullDate, setFullDate] = React.useState(getTodayString());
@@ -223,7 +218,7 @@
 
       // --- 條件式渲染介面 ---
 
-      // 1. 驗證中 (會顯示此文字)
+      // 1. 驗證中
       if (authStatus === 'loading') {
         return (
           <div className="min-h-screen flex items-center justify-center bg-slate-50 text-amber-900 font-black px-10 text-center font-black">
@@ -238,24 +233,18 @@
         );
       }
 
-      // 2. 驗證失敗/超時 (一定會看到按鈕)
+      // 2. 驗證失敗/超時 (已移除按鈕)
       if (authStatus === 'denied') {
         return (
-          <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-400 font-black p-10">
+          <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-400 font-black p-10 font-black">
             <div className="text-center space-y-8 max-w-sm">
               <div className="text-8xl">🚧</div>
               <div>
-                <p className="tracking-[0.3em] uppercase italic text-sm mb-2 font-black text-slate-500">System Under Maintenance</p>
+                <p className="tracking-[0.3em] uppercase italic text-sm mb-2 font-black text-slate-500 font-black">System Under Maintenance</p>
                 <p className="text-[10px] opacity-50 tracking-widest font-mono font-black uppercase">ERROR: 403_ACCESS_DENIED</p>
               </div>
               <div className="pt-4">
-                <button 
-                  onClick={() => setRetryCount(c => c + 1)} 
-                  className="w-full py-5 bg-white border-4 border-slate-200 rounded-3xl text-sm font-black uppercase tracking-widest active:scale-95 shadow-sm hover:border-amber-400 hover:text-amber-600 transition-all cursor-pointer font-black font-black"
-                >
-                  點此重新嘗試驗證
-                </button>
-                <p className="mt-4 text-[10px] text-slate-300">請確認網址末端 ID 是否與 GAS 設定一致</p>
+                <p className="mt-4 text-[10px] text-slate-300 font-black">請確認網址末端 ID 是否與 GAS 設定一致</p>
               </div>
             </div>
           </div>
@@ -310,19 +299,19 @@
               </div>
               <div className="glass-card rounded-[2.5rem] p-6 shadow-inner text-center flex flex-col items-center font-black font-black font-black">
                 <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-4 italic font-black font-black font-black font-black">喝了多少 (杯)</label>
-                <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black font-black font-black font-black font-black">
+                <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black font-black font-black font-black font-black font-black">
                   <button type="button" onClick={() => adjustCup(-1)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black"><Icon name="Minus" className="w-4 h-4 font-black"/></button>
                   <div className="text-5xl font-mono font-black text-amber-950 px-2 tracking-tighter leading-none font-black font-black font-black font-black">{formData.cup}</div>
-                  <button type="button" onClick={() => adjustCup(1)} className="w-11 h-11 rounded-2xl bg-amber-950 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black"><Icon name="Plus" className="w-4 h-4 font-black"/></button>
+                  <button type="button" onClick={() => adjustCup(1)} className="w-11 h-11 rounded-2xl bg-amber-950 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black"><Icon name="Plus" className="w-4 h-4 font-black"/></button>
                 </div>
               </div>
               <div className="glass-card rounded-[2.5rem] p-6 shadow-inner flex flex-col items-center font-black font-black font-black">
                 <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-6 font-black font-black font-black font-black font-black">每杯體積 (ml)</label>
                 <div className="flex flex-col w-full items-center gap-6 font-black font-black font-black">
-                  <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black font-black font-black font-black font-black">
-                    <button type="button" onClick={() => adjustVolume(-10)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black"><Icon name="Minus" className="w-4 h-4 font-black"/></button>
+                  <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black font-black font-black font-black font-black font-black font-black font-black">
+                    <button type="button" onClick={() => adjustVolume(-10)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black font-black"><Icon name="Minus" className="w-4 h-4 font-black"/></button>
                     <div className="text-5xl font-mono font-black text-amber-950 px-2 tracking-tight leading-none font-black font-black font-black font-black font-black font-black">{formData.volume}</div>
-                    <button type="button" onClick={() => adjustVolume(10)} className="w-11 h-11 rounded-2xl bg-amber-600 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md shadow-amber-200 flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black"><Icon name="Plus" className="w-4 h-4 font-black"/></button>
+                    <button type="button" onClick={() => adjustVolume(10)} className="w-11 h-11 rounded-2xl bg-amber-600 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md shadow-amber-200 flex-shrink-0 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black font-black"><Icon name="Plus" className="w-4 h-4 font-black"/></button>
                   </div>
                   <div className="grid grid-cols-4 gap-2 w-full font-black font-black font-black font-black font-black">
                     {volumePresets.map(v => ( <button key={v} type="button" onClick={() => setFormData(p => ({ ...p, volume: v }))} className={`py-3 rounded-xl text-[14px] font-black transition-all cursor-pointer font-black font-black font-black font-black ${Number(formData.volume) === v ? 'bg-amber-950 text-white shadow-md' : 'bg-white/50 text-amber-900 hover:bg-white/80'}`}>{v}ml</button> ))}
@@ -330,16 +319,16 @@
                 </div>
               </div>
               <div className="glass-card rounded-[2.5rem] p-8 shadow-inner flex flex-col items-center relative overflow-hidden border-2 border-amber-100/50 font-black font-black font-black font-black font-black">
-                 <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 text-4xl pointer-events-none font-black font-black font-black font-black font-black font-black">✒️</div>
+                 <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 text-4xl pointer-events-none font-black font-black font-black font-black font-black font-black font-black">✒️</div>
                  <span className="text-[11px] font-black uppercase tracking-[0.5em] text-amber-900/40 mb-2 font-black font-black font-black font-black font-black font-black font-black">ADDITIONAL NOTES</span>
                  <input type="text" value={formData.note} onChange={(e) => setFormData(p => ({ ...p, note: e.target.value }))} placeholder="..." className="w-full bg-transparent text-center text-xl font-bold text-amber-950 placeholder:text-amber-900/20 outline-none font-black font-black font-black font-black font-black font-black font-black font-black" />
               </div>
               <div className="bg-amber-950 rounded-[2.5rem] p-8 text-white shadow-2xl flex flex-col items-center relative overflow-hidden font-black font-black font-black font-black">
                  <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 text-4xl font-black font-black font-black font-black font-black font-black font-black">🥂</div>
                  <span className="text-[11px] font-black uppercase tracking-[0.5em] opacity-40 mb-1 text-amber-500 font-black font-black font-black font-black font-black">TOTAL CONSUMPTION</span>
-                 <div className="text-6xl font-mono font-black tracking-tighter text-amber-50 font-black font-black font-black font-black font-black font-black font-black">{totalVolume} <span className="text-xl font-bold opacity-40 ml-1 font-black font-black font-black font-black font-black">ml</span></div>
+                 <div className="text-6xl font-mono font-black tracking-tighter text-amber-50 font-black font-black font-black font-black font-black font-black font-black">{totalVolume} <span className="text-xl font-bold opacity-40 ml-1 font-black font-black font-black font-black font-black font-black">ml</span></div>
               </div>
-              <button type="submit" disabled={status === 'loading' || !formData.category || !formData.user} className={`w-full py-6 rounded-full font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-4 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black ${status === 'loading' ? 'bg-amber-200 text-amber-400 cursor-not-allowed' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black font-black'}`}>{status === 'loading' ? <Icon name="Loader" className="w-8 h-8 text-amber-900" /> : <span className="tracking-[0.2em] font-black uppercase italic text-amber-50 font-black font-black font-black font-black font-black font-black font-black font-black font-black">乾杯!</span>}</button>
+              <button type="submit" disabled={status === 'loading' || !formData.category || !formData.user} className={`w-full py-6 rounded-full font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-4 cursor-pointer font-black font-black font-black font-black font-black font-black font-black font-black ${status === 'loading' ? 'bg-amber-200 text-amber-400 cursor-not-allowed' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white font-black font-black'}`}>{status === 'loading' ? <Icon name="Loader" className="w-8 h-8 text-amber-900" /> : <span className="tracking-[0.2em] font-black uppercase italic text-amber-50 font-black font-black font-black font-black font-black font-black font-black font-black font-black font-black">乾杯!</span>}</button>
             </form>
           </div>
         </div>
