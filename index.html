@@ -42,6 +42,25 @@
       return icons[name] || null;
     };
 
+    // 葡萄酒藝術圖示
+    const RedWineIcon = () => (
+      <svg viewBox="0 0 64 64" className="w-16 h-16 filter drop-shadow-sm">
+        <path d="M18,32 Q18,46 32,46 Q46,46 46,32 L46,16 L18,16 Z" fill="#991B1B" />
+        <path d="M32,46 L32,58 M20,58 L44,58" stroke="#78350F" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+        <path d="M18,16 L46,16 L46,32 Q46,48 32,48 Q18,48 18,32 Z" fill="none" stroke="#78350F" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    );
+
+    // 水果酒藝術圖示
+    const FruitWineIcon = () => (
+      <svg viewBox="0 0 64 64" className="w-16 h-16 filter drop-shadow-sm">
+        <path d="M18,48 Q18,58 32,58 Q46,58 46,48 L46,24 L18,24 Z" fill="#D97706" opacity="0.9" />
+        <path d="M20,36 Q20,24 32,24 Q44,24 44,36 Q44,48 32,48 Q20,48 20,36 Z" fill="white" opacity="0.65" />
+        <path d="M26,32 Q32,28 39,33" stroke="white" strokeWidth="2" opacity="0.7" fill="none" strokeLinecap="round" />
+        <path d="M16,20 L48,20 L48,48 Q48,60 32,60 Q16,60 16,48 Z" fill="none" stroke="#78350F" strokeWidth="3" strokeLinecap="round" />
+      </svg>
+    );
+
     const BubbleBg = () => {
       const bubbles = React.useMemo(() => [...Array(15)].map((_, i) => ({ id: i, left: `${Math.random() * 100}%`, size: `${Math.random() * 20 + 8}px`, duration: `${Math.random() * 4 + 6}s`, delay: `${Math.random() * 5}s` })), []);
       return ( <div className="fixed inset-0 overflow-hidden z-0 pointer-events-none">{bubbles.map(b => ( <div key={b.id} className="bubble" style={{ left: b.left, width: b.size, height: b.size, animationDuration: b.duration, animationDelay: b.delay }} /> ))}</div> );
@@ -99,7 +118,16 @@
           return;
         }
 
+        // 安全計時器：如果 5 秒內後端沒回應，判定為驗證失敗，防止無限載入
+        const timeout = setTimeout(() => {
+          if (authStatus === 'loading') {
+            setAuthStatus('denied');
+            document.getElementById('verify-script')?.remove();
+          }
+        }, 5000);
+
         window.onVerifyResult = (res) => {
+          clearTimeout(timeout);
           if (res.auth === 'OK') {
             setApiToken(id);
             setAuthStatus('authorized');
@@ -112,7 +140,13 @@
         const script = document.createElement('script');
         script.id = 'verify-script';
         script.src = `${apiUrl}?action=verify&id=${id}&callback=onVerifyResult`;
+        script.onerror = () => {
+          clearTimeout(timeout);
+          setAuthStatus('denied');
+        };
         document.body.appendChild(script);
+
+        return () => clearTimeout(timeout);
       }, []);
 
       const getTodayString = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; };
@@ -125,8 +159,8 @@
       const drinkTypes = [
         { name: "啤酒", emoji: "🍺", defaultVol: 330 },
         { name: "沙瓦", emoji: "🍹", defaultVol: 330 },
-        { name: "葡萄酒", emoji: "🍷", defaultVol: 100 },
-        { name: "水果酒", emoji: "🥃", defaultVol: 100 },
+        { name: "葡萄酒", emoji: <RedWineIcon />, defaultVol: 100 },
+        { name: "水果酒", emoji: <FruitWineIcon />, defaultVol: 100 },
         { name: "清酒", emoji: "🍶", defaultVol: 50 },
         { name: "其他", emoji: "✨", defaultVol: 100 }
       ];
@@ -209,51 +243,58 @@
             </div>
             <form onSubmit={handleSubmit} className="space-y-6">
               <section className={`glass-card rounded-[2.5rem] p-6 shadow-sm border-2 border-transparent text-center relative ${showCalendar ? 'z-[50]' : 'z-20'}`}>
-                <label className="text-[14px] font-black text-amber-900 tracking-widest mb-4 flex items-center justify-center font-black"><Icon name="Calendar" className="w-4 h-4 mr-2 text-amber-900" /> 享受日期 <span className="text-red-600 ml-1 font-black">*</span></label>
-                <button type="button" onClick={() => setShowCalendar(true)} className="w-full p-4 bg-amber-50/50 rounded-2xl border-2 border-amber-100 text-amber-900 font-black outline-none text-xl shadow-inner text-center calendar-btn cursor-pointer font-black font-black">{fullDate.replace(/-/g, ' / ')}</button>
+                <label className="text-[14px] font-black text-amber-900 tracking-widest mb-4 flex items-center justify-center font-black font-black"><Icon name="Calendar" className="w-4 h-4 mr-2 text-amber-900" /> 享受日期 <span className="text-red-600 ml-1 font-black">*</span></label>
+                <button type="button" onClick={() => setShowCalendar(true)} className="w-full p-4 bg-amber-50/50 rounded-2xl border-2 border-amber-100 text-amber-900 font-black outline-none text-xl shadow-inner text-center calendar-btn cursor-pointer font-black">{fullDate.replace(/-/g, ' / ')}</button>
                 {showCalendar && <CustomCalendar selectedDate={fullDate} onSelect={setFullDate} onClose={() => setShowCalendar(false)} />}
               </section>
               <section className="glass-card rounded-[2.5rem] p-6 shadow-sm border-2 border-transparent text-center font-black">
-                <label className="text-[14px] font-black text-amber-900 tracking-widest mb-4 flex items-center justify-center font-black font-black font-black"><Icon name="User" className="w-4 h-4 mr-2 text-amber-900" /> 誰喝酒!! <span className="text-red-600 ml-1 font-black">*</span></label>
+                <label className="text-[14px] font-black text-amber-900 tracking-widest mb-4 flex items-center justify-center font-black font-black"><Icon name="User" className="w-4 h-4 mr-2 text-amber-900" /> 誰喝酒!! <span className="text-red-600 ml-1 font-black">*</span></label>
                 <div className="grid grid-cols-2 gap-4">
                   {["庭", "珊"].map(u => ( <button key={u} type="button" onClick={() => setFormData(p => ({ ...p, user: u }))} className={`user-card relative py-4 rounded-2xl overflow-hidden flex items-center justify-center font-black text-xl border-2 transition-all active:scale-95 cursor-pointer ${formData.user === u ? 'active' : 'glass-card bg-amber-50/50 border-amber-100 text-amber-900'}`}>{u}</button> ))}
                 </div>
               </section>
               <div className="grid grid-cols-2 gap-4 font-black">
-                {drinkTypes.map(d => ( <button key={d.name} type="button" onClick={() => handleCategorySelect(d)} className={`drink-card relative h-36 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center space-y-2 border-2 border-transparent cursor-pointer ${formData.category === d.name ? 'active' : 'bg-white/40 opacity-90 shadow-sm'}`}><span className="text-6xl mb-1">{d.emoji}</span><span className={`text-[14px] font-black tracking-wider ${formData.category === d.name ? 'text-amber-950' : 'text-amber-900'}`}>{d.name}</span></button> ))}
+                {drinkTypes.map(d => ( 
+                  <button key={d.name} type="button" onClick={() => handleCategorySelect(d)} className={`drink-card relative h-36 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center space-y-2 border-2 border-transparent cursor-pointer ${formData.category === d.name ? 'active' : 'bg-white/40 opacity-90 shadow-sm'}`}>
+                    <div className="flex items-center justify-center h-16">
+                      {typeof d.emoji === 'string' ? <span className="text-6xl">{d.emoji}</span> : d.emoji}
+                    </div>
+                    <span className={`text-[14px] font-black tracking-wider ${formData.category === d.name ? 'text-amber-950' : 'text-amber-900'}`}>{d.name}</span>
+                  </button> 
+                ))}
               </div>
-              <div className="glass-card rounded-[2.5rem] p-6 shadow-inner text-center flex flex-col items-center font-black font-black">
-                <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-4 italic font-black font-black">喝了多少 (杯)</label>
+              <div className="glass-card rounded-[2.5rem] p-6 shadow-inner text-center flex flex-col items-center font-black">
+                <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-4 italic font-black">喝了多少 (杯)</label>
                 <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black">
                   <button type="button" onClick={() => adjustCup(-1)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black"><Icon name="Minus" className="w-4 h-4"/></button>
                   <div className="text-5xl font-mono font-black text-amber-950 px-2 tracking-tighter leading-none">{formData.cup}</div>
                   <button type="button" onClick={() => adjustCup(1)} className="w-11 h-11 rounded-2xl bg-amber-950 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md flex-shrink-0 cursor-pointer font-black font-black"><Icon name="Plus" className="w-4 h-4"/></button>
                 </div>
               </div>
-              <div className="glass-card rounded-[2.5rem] p-6 shadow-inner flex flex-col items-center font-black font-black">
-                <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-6 font-black font-black font-black">每杯體積 (ml)</label>
+              <div className="glass-card rounded-[2.5rem] p-6 shadow-inner flex flex-col items-center font-black">
+                <label className="text-[14px] font-black text-amber-900 tracking-widest block mb-6 font-black">每杯體積 (ml)</label>
                 <div className="flex flex-col w-full items-center gap-6 font-black">
                   <div className="w-full max-w-[310px] flex items-center justify-between glass-card bg-white/40 p-2 px-4 rounded-3xl border-2 border-amber-100 min-w-0 font-black">
-                    <button type="button" onClick={() => adjustVolume(-10)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black font-black"><Icon name="Minus" className="w-4 h-4"/></button>
+                    <button type="button" onClick={() => adjustVolume(-10)} className="w-11 h-11 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-950 active:scale-90 transition-transform shadow-sm flex-shrink-0 cursor-pointer font-black font-black"><Icon name="Minus" className="w-4 h-4"/></button>
                     <div className="text-5xl font-mono font-black text-amber-950 px-2 tracking-tight leading-none font-black">{formData.volume}</div>
-                    <button type="button" onClick={() => adjustVolume(10)} className="w-11 h-11 rounded-2xl bg-amber-600 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md shadow-amber-200 flex-shrink-0 cursor-pointer font-black font-black font-black"><Icon name="Plus" className="w-4 h-4"/></button>
+                    <button type="button" onClick={() => adjustVolume(10)} className="w-11 h-11 rounded-2xl bg-amber-600 flex items-center justify-center text-white active:scale-90 transition-transform shadow-md shadow-amber-200 flex-shrink-0 cursor-pointer font-black font-black"><Icon name="Plus" className="w-4 h-4"/></button>
                   </div>
                   <div className="grid grid-cols-4 gap-2 w-full font-black">
                     {volumePresets.map(v => ( <button key={v} type="button" onClick={() => setFormData(p => ({ ...p, volume: v }))} className={`py-3 rounded-xl text-[14px] font-black transition-all cursor-pointer ${Number(formData.volume) === v ? 'bg-amber-950 text-white shadow-md' : 'bg-white/50 text-amber-900 hover:bg-white/80'}`}>{v}ml</button> ))}
                   </div>
                 </div>
               </div>
-              <div className="glass-card rounded-[2.5rem] p-8 shadow-inner flex flex-col items-center relative overflow-hidden border-2 border-amber-100/50 font-black font-black">
-                 <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 text-4xl pointer-events-none font-black font-black font-black font-black font-black font-black">✒️</div>
-                 <span className="text-[11px] font-black uppercase tracking-[0.5em] text-amber-900/40 mb-2 font-black font-black">ADDITIONAL NOTES</span>
+              <div className="glass-card rounded-[2.5rem] p-8 shadow-inner flex flex-col items-center relative overflow-hidden border-2 border-amber-100/50 font-black">
+                 <div className="absolute top-0 right-0 p-4 opacity-5 rotate-12 text-4xl pointer-events-none font-black">✒️</div>
+                 <span className="text-[11px] font-black uppercase tracking-[0.5em] text-amber-900/40 mb-2 font-black font-black font-black">ADDITIONAL NOTES</span>
                  <input type="text" value={formData.note} onChange={(e) => setFormData(p => ({ ...p, note: e.target.value }))} placeholder="..." className="w-full bg-transparent text-center text-xl font-bold text-amber-950 placeholder:text-amber-900/20 outline-none font-black font-black font-black" />
               </div>
-              <div className="bg-amber-950 rounded-[2.5rem] p-8 text-white shadow-2xl flex flex-col items-center relative overflow-hidden font-black font-black">
-                 <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 text-4xl font-black font-black font-black font-black font-black">🥂</div>
+              <div className="bg-amber-950 rounded-[2.5rem] p-8 text-white shadow-2xl flex flex-col items-center relative overflow-hidden font-black">
+                 <div className="absolute top-0 right-0 p-4 opacity-10 rotate-12 text-4xl font-black">🥂</div>
                  <span className="text-[11px] font-black uppercase tracking-[0.5em] opacity-40 mb-1 text-amber-500 font-black font-black">TOTAL CONSUMPTION</span>
                  <div className="text-6xl font-mono font-black tracking-tighter text-amber-50 font-black font-black font-black">{totalVolume} <span className="text-xl font-bold opacity-40 ml-1">ml</span></div>
               </div>
-              <button type="submit" disabled={status === 'loading' || !formData.category || !formData.user} className={`w-full py-6 rounded-full font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-4 cursor-pointer font-black font-black font-black ${status === 'loading' ? 'bg-amber-200 text-amber-400 cursor-not-allowed' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'}`}>{status === 'loading' ? <Icon name="Loader" className="w-8 h-8 text-amber-900" /> : <span className="tracking-[0.2em] font-black uppercase italic text-amber-50 font-black font-black">乾杯!</span>}</button>
+              <button type="submit" disabled={status === 'loading' || !formData.category || !formData.user} className={`w-full py-6 rounded-full font-black text-2xl shadow-2xl transition-all active:scale-95 flex items-center justify-center space-x-4 cursor-pointer font-black font-black font-black ${status === 'loading' ? 'bg-amber-200 text-amber-400 cursor-not-allowed' : 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'}`}>{status === 'loading' ? <Icon name="Loader" className="w-8 h-8 text-amber-900" /> : <span className="tracking-[0.2em] font-black uppercase italic text-amber-50 font-black font-black font-black">乾杯!</span>}</button>
             </form>
           </div>
         </div>
