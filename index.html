@@ -130,11 +130,12 @@
       const drinkTypes = [
         { name: "啤酒", emoji: "🍺", defaultVol: 330 },
         { name: "沙瓦", emoji: "🍹", defaultVol: 330 },
-        { name: "紅白酒", emoji: <RedWineIcon />, defaultVol: 100 },
-        { name: "水果酒", emoji: <FruitWineIcon />, defaultVol: 100 },
+        { name: "葡萄酒", emoji: "🍷", defaultVol: 100 },
+        { name: "水果酒", emoji: "🥃", defaultVol: 100 },
         { name: "清酒", emoji: "🍶", defaultVol: 50 },
-        { name: "其他", emoji: "✨", defaultVol: 330 }
+        { name: "其他", emoji: "✨", defaultVol: 100 }
       ];
+      
       const volumePresets = [50, 100, 330, 500];
       const totalVolume = Math.round((Number(formData.cup) * Number(formData.volume)) * 10) / 10;
 
