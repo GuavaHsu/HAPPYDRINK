@@ -176,11 +176,12 @@
       const drinkTypes = [
         { name: "啤酒", emoji: "🍺", defaultVol: 330 },
         { name: "沙瓦", emoji: "🍹", defaultVol: 330 },
-        { name: "葡萄酒", emoji: <RedWineIcon />, defaultVol: 100 },
-        { name: "水果酒", emoji: <FruitWineIcon />, defaultVol: 100 },
+        { name: "葡萄酒", emoji: "🍷", defaultVol: 100 },
+        { name: "水果酒", emoji: "🥃", defaultVol: 100 },
         { name: "清酒", emoji: "🍶", defaultVol: 50 },
         { name: "其他", emoji: "✨", defaultVol: 100 }
       ];
+      
       const volumePresets = [50, 100, 330, 500];
       const totalVolume = Math.round((Number(formData.cup) * Number(formData.volume)) * 10) / 10;
 
@@ -241,12 +242,9 @@
               <div className="text-8xl">🚧</div>
               <div>
                 <p className="tracking-[0.3em] uppercase italic text-sm mb-2 font-black text-slate-500 font-black">System Under Maintenance</p>
-                <p className="text-[10px] opacity-50 tracking-widest font-mono font-black uppercase">ERROR: 403_ACCESS_DENIED</p>
+                <p className="text-[10px] opacity-50 tracking-widest font-mono font-black uppercase">請確認網址末端ID是否正確</p>
               </div>
-              <div className="pt-4">
-                <p className="mt-4 text-[10px] text-slate-300 font-black">請確認網址末端 ID 是否與 GAS 設定一致</p>
-              </div>
-            </div>
+             </div>
           </div>
         );
       }
