@@ -1114,19 +1114,18 @@
             }, [activeTab]);
 
             if (authStatus === 'loading') {
-                const loaderColorClass = activeTab === 'expense' ? 'text-pink-600' : 'text-amber-500';
                 return (
-                    <div className="min-h-screen flex items-center justify-center text-center px-10">
-                        <div className="space-y-6">
-                            <Icon name="Loader" className={`w-16 h-16 mx-auto ${loaderColorClass}`} />
-                            <div className="space-y-2">
-                                <p className="tracking-[0.2em] uppercase italic text-xl font-black">正在安全驗證中...</p>
-                                <p className="text-xs text-slate-400 font-medium tracking-widest">正在連線至 Google 伺服器</p>
-                            </div>
-                        </div>
+                  <div className="min-h-screen flex items-center justify-center bg-[#FCE4EC] text-pink-700 font-bold px-10 text-center">
+                    <div className="space-y-6">
+                      <Icon name="Loader" className="w-16 h-16 mx-auto text-pink-600" />
+                      <div className="space-y-2">
+                        <p className="tracking-[0.2em] uppercase italic text-xl font-black">正在安全驗證中...</p>
+                        <p className="text-xs text-slate-400 font-medium tracking-widest">正在連線至 Google 伺服器</p>
+                      </div>
                     </div>
+                  </div>
                 );
-            }
+              }
 
             if (authStatus === 'denied') {
                 const handleManualLogin = (e) => {
