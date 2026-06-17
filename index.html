@@ -11,10 +11,11 @@
     <meta name="apple-mobile-web-app-title" content="養成記帳好習慣!!">
     <link rel="apple-touch-icon" href="./icon-192.png">
     
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone@7.23.12/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         /* --- 動畫效果 --- */
         @keyframes float {
@@ -395,7 +396,6 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            // 【終極修復】ExpenseApp 無 async/await
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.user || !formData.category || !formData.amount) return;
@@ -680,6 +680,7 @@
 
             const filteredDataRows = data ? data.filter(row => row && row[3]) : [];
 
+            // 優先從備註判定成員，若備註沒提到任何人，則依據原本是誰喝酒欄位
             const isUserRow = (row, userName, otherName) => {
                 const userCol = row[4] || "";
                 const noteCol = row[8] || "";
@@ -688,9 +689,11 @@
                 return userCol === userName;
             };
 
+            // 分別過濾出庭與珊的資料列
             const tingRows = filteredDataRows.filter(row => isUserRow(row, "庭", "珊"));
             const shanRows = filteredDataRows.filter(row => isUserRow(row, "珊", "庭"));
 
+            // 分別按酒類累加杯數
             const tingCups = tingRows.reduce((acc, row) => {
                 const cat = row[3];
                 const cup = Number(row[4]) || 0;
@@ -910,7 +913,7 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            // 【終極修復】WineApp 也拿掉 async/await，不再產生 import 語句
+            // 【終極修復】WineApp 拿掉 async/await，不再產生 import 語句
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.category || !formData.user) return;
@@ -1234,17 +1237,28 @@
             );
         };
 
-        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        // 終極錯誤防護罩，就算發生語法錯誤也會印在畫面上
+        try {
+            ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+        } catch (error) {
+            document.body.innerHTML = `<div style="padding: 2rem; color: #E91E63; font-weight: bold; text-align: center; font-size: 1.2rem;"><h2>React 渲染失敗</h2><p>${error.message}</p></div>`;
+            console.error(error);
+        }
     </script>
+
     <script>
         // 強制註銷舊版 Service Worker，清除破壞網頁的快取
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
                     registration.unregister();
-                    console.log('👻 幽靈快取已成功清除！');
                 }
             });
+        }
+        if ('caches' in window) {
+            caches.keys().then((keyList) => {
+                return Promise.all(keyList.map((key) => caches.delete(key)));
+            }).then(() => console.log('👻 快取已徹底清除！'));
         }
     </script>
 </body>
