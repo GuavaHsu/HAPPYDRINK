@@ -11,26 +11,17 @@
     <meta name="apple-mobile-web-app-title" content="養成記帳好習慣!!">
     <link rel="apple-touch-icon" href="./icon-192.png">
     
+    <!-- 改用穩定的 cdnjs 來源 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.3/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.6/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         /* --- 動畫效果 --- */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        @keyframes bubble {
-            0% { transform: translateY(100vh) scale(0); opacity: 0; }
-            50% { opacity: 0.4; }
-            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-10px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes bubble { 0% { transform: translateY(100vh) scale(0); opacity: 0; } 50% { opacity: 0.4; } 100% { transform: translateY(-10vh) scale(1.2); opacity: 0; } }
+        @keyframes slideDown { from { transform: translateY(-10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         /* --- 全域主題變換與樣式 --- */
         html { height: 100%; }
@@ -55,9 +46,13 @@
 </head>
 
 <body>
+    <!-- 乾淨的 root 掛載點 -->
     <div id="root"></div>
 
-    <script type="text/babel">
+    <!-- 加上 data-presets="react" 強迫 Babel 乖乖聽話，不准塞 import -->
+    <script type="text/babel" data-presets="react">
+        console.log("=== V7 最終潔淨版載入成功 ===");
+
         // --- 整合的圖示元件 ---
         const Icon = ({ name, className = "w-4 h-4" }) => {
             const icons = {
@@ -143,7 +138,7 @@
                         <div className="bg-pink-500 p-4 text-white flex justify-between items-center px-6">
                             <button type="button" onClick={prevYear} className="p-2 hover:bg-white/10 rounded-full cursor-pointer"><Icon name="ChevronLeft" className="w-5 h-5" /></button>
                             <h3 className="text-lg font-bold">{viewYear}年</h3>
-                            <button type="button" onClick={nextYear} className="p-2 hover:bg-white/10 rounded-full cursor-pointer"><Icon name="ChevronRight" className="w-5 h-5" /></button>
+                            <button type="button" onClick={nextMonth} className="p-2 hover:bg-white/10 rounded-full cursor-pointer"><Icon name="ChevronRight" className="w-5 h-5" /></button>
                         </div>
                         <div className="p-6">
                             <div className="grid grid-cols-3 gap-3 text-center font-bold">
@@ -447,7 +442,7 @@
                     <div className="max-w-md mx-auto space-y-4">
                         <div className="bg-white rounded-2xl shadow-sm border-t-8 border-pink-500 p-6 relative overflow-hidden text-center">
                             <h1 className="text-2xl font-bold text-gray-800 tracking-tight">養成記帳好習慣!!</h1>
-                            <p className="text-gray-500 mt-1 text-sm font-medium">今天花了多少呢？</p>
+                            <p className="text-gray-500 mt-1 text-sm font-medium">今天花了多少呢?</p>
                             <button onClick={() => changeView('report')} className="absolute bottom-4 right-4 p-3 bg-pink-100 rounded-full text-pink-600 hover:bg-pink-200 transition-all shadow-sm">
                                 <Icon name="History" className="w-5 h-5" />
                             </button>
@@ -592,7 +587,6 @@
             );
         };
 
-        // --- 微醺時光月份選擇器 (琥珀色) ---
         const CustomWineMonthPicker = ({ selectedDate, onSelect, onClose }) => {
             const dateObj = new Date(selectedDate);
             const [viewYear, setViewYear] = React.useState(dateObj.getFullYear());
@@ -643,7 +637,6 @@
             );
         };
 
-        // --- 微醺時光歷史統計頁面 (琥珀色) ---
         const WineReportPage = ({ setView, apiUrl, apiToken }) => {
             const getTodayString = () => { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; };
             const [selectedDate, setSelectedDate] = React.useState(getTodayString());
@@ -680,7 +673,6 @@
 
             const filteredDataRows = data ? data.filter(row => row && row[3]) : [];
 
-            // 優先從備註判定成員，若備註沒提到任何人，則依據原本是誰喝酒欄位
             const isUserRow = (row, userName, otherName) => {
                 const userCol = row[4] || "";
                 const noteCol = row[8] || "";
@@ -689,11 +681,9 @@
                 return userCol === userName;
             };
 
-            // 分別過濾出庭與珊的資料列
             const tingRows = filteredDataRows.filter(row => isUserRow(row, "庭", "珊"));
             const shanRows = filteredDataRows.filter(row => isUserRow(row, "珊", "庭"));
 
-            // 分別按酒類累加杯數
             const tingCups = tingRows.reduce((acc, row) => {
                 const cat = row[3];
                 const cup = Number(row[4]) || 0;
@@ -735,7 +725,6 @@
                                 <div className="glass-card rounded-[2.5rem] p-6 shadow-sm space-y-6">
                                     <h3 className="font-black text-amber-900 mb-2 text-center text-xl tracking-wider">當月開心紀錄</h3>
 
-                                    {/* 庭的紀錄 */}
                                     <div className="p-4 rounded-3xl bg-amber-50/40 border border-amber-900/5 space-y-2">
                                         <h4 className="font-black text-amber-950 text-base border-b border-amber-900/10 pb-1 flex items-center">
                                             <span className="mr-1">庭的紀錄</span>
@@ -754,7 +743,6 @@
                                         </div>
                                     </div>
 
-                                    {/* 珊的紀錄 */}
                                     <div className="p-4 rounded-3xl bg-amber-50/40 border border-amber-900/5 space-y-2">
                                         <h4 className="font-black text-amber-950 text-base border-b border-amber-900/10 pb-1 flex items-center">
                                             <span className="mr-1">珊的紀錄</span>
@@ -770,7 +758,6 @@
                                                     </div>
                                                 ))
                                             )}
-
                                         </div>
                                     </div>
                                 </div>
@@ -913,7 +900,6 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            // 【終極修復】WineApp 拿掉 async/await，不再產生 import 語句
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.category || !formData.user) return;
@@ -1114,18 +1100,19 @@
             }, [activeTab]);
 
             if (authStatus === 'loading') {
+                const loaderColorClass = activeTab === 'expense' ? 'text-pink-600' : 'text-amber-500';
                 return (
-                  <div className="min-h-screen flex items-center justify-center bg-[#FCE4EC] text-pink-700 font-bold px-10 text-center">
-                    <div className="space-y-6">
-                      <Icon name="Loader" className="w-16 h-16 mx-auto text-pink-600" />
-                      <div className="space-y-2">
-                        <p className="tracking-[0.2em] uppercase italic text-xl font-black">正在安全驗證中...</p>
-                        <p className="text-xs text-slate-400 font-medium tracking-widest">正在連線至 Google 伺服器</p>
-                      </div>
+                    <div className="min-h-screen flex items-center justify-center bg-[#FCE4EC] text-pink-700 font-bold px-10 text-center">
+                        <div className="space-y-6">
+                            <Icon name="Loader" className="w-16 h-16 mx-auto text-pink-600" />
+                            <div className="space-y-2">
+                                <p className="tracking-[0.2em] uppercase italic text-xl font-black">正在安全驗證中...</p>
+                                <p className="text-xs text-slate-400 font-medium tracking-widest">正在連線至 Google 伺服器</p>
+                            </div>
+                        </div>
                     </div>
-                  </div>
                 );
-              }
+            }
 
             if (authStatus === 'denied') {
                 const handleManualLogin = (e) => {
@@ -1236,7 +1223,7 @@
             );
         };
 
-        // 終極錯誤防護罩，就算發生語法錯誤也會印在畫面上
+        // 終極錯誤防護罩
         try {
             ReactDOM.createRoot(document.getElementById('root')).render(<App />);
         } catch (error) {
@@ -1246,7 +1233,7 @@
     </script>
 
     <script>
-        // 強制註銷舊版 Service Worker，清除破壞網頁的快取
+        // 強制清理 Service Worker 快取
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
