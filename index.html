@@ -13,148 +13,50 @@
     
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.23.12/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* --- 動畫效果 --- */
         @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-
         @keyframes bubble {
-            0% {
-                transform: translateY(100vh) scale(0);
-                opacity: 0;
-            }
-
-            50% {
-                opacity: 0.4;
-            }
-
-            100% {
-                transform: translateY(-10vh) scale(1.2);
-                opacity: 0;
-            }
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            50% { opacity: 0.4; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
         }
-
         @keyframes slideDown {
-            from {
-                transform: translateY(-10px);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateY(0);
-                opacity: 1;
-            }
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         /* --- 全域主題變換與樣式 --- */
-        html {
-            height: 100%;
-        }
-
+        html { height: 100%; }
         body {
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
-            min-height: 100%;
-            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            transition: background 0.5s ease;
+            margin: 0; padding: 0; overflow-x: hidden; overflow-y: auto;
+            min-height: 100%; font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            -webkit-tap-highlight-color: transparent; transition: background 0.5s ease;
         }
-
-        /* 記帳主題背景 */
-        body.theme-expense {
-            background-color: #FCE4EC;
-            background-image: none;
-        }
-
-        /* 記酒主題背景 */
-        body.theme-wine {
-            background: linear-gradient(to right, #fffbeb 0%, #fef3c7 50%, #fde68a 100%) fixed;
-            background-size: cover;
-        }
-
-        /* 漂浮氣泡 */
-        .bubble {
-            position: fixed;
-            bottom: -30px;
-            background: rgba(245, 158, 11, 0.25);
-            border-radius: 50%;
-            animation: bubble linear infinite;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* 玻璃卡片 */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        /* 記酒卡片動畫 */
-        .drink-card,
-        .user-card {
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .drink-card.active,
-        .user-card.active {
-            transform: scale(1.05);
-            background-color: #f59e0b !important;
-            border: 3px solid #78350f !important;
-            box-shadow: 0 15px 20px -5px rgba(245, 158, 11, 0.4);
-        }
-
-        /* 滾動條樣式 */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--scrollbar-thumb-color, #F8BBD0);
-            border-radius: 10px;
-        }
-
-        /* 輸入與按鈕的優化 */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
-
-        input,
-        button,
-        textarea {
-            -webkit-appearance: none;
-            outline: none !important;
-        }
-
-        .calendar-btn:active {
-            transform: scale(0.98);
-        }
+        body.theme-expense { background-color: #FCE4EC; background-image: none; }
+        body.theme-wine { background: linear-gradient(to right, #fffbeb 0%, #fef3c7 50%, #fde68a 100%) fixed; background-size: cover; }
+        .bubble { position: fixed; bottom: -30px; background: rgba(245, 158, 11, 0.25); border-radius: 50%; animation: bubble linear infinite; z-index: 0; pointer-events: none; }
+        .glass-card { background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .drink-card, .user-card { transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        .drink-card.active, .user-card.active { transform: scale(1.05); background-color: #f59e0b !important; border: 3px solid #78350f !important; box-shadow: 0 15px 20px -5px rgba(245, 158, 11, 0.4); }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb-color, #F8BBD0); border-radius: 10px; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+        input, button, textarea { -webkit-appearance: none; outline: none !important; }
+        .calendar-btn:active { transform: scale(0.98); }
     </style>
 </head>
 
 <body>
     <div id="root"></div>
 
-    <script type="text/babel" data-presets="react,env">
+    <script type="text/babel">
         // --- 整合的圖示元件 ---
         const Icon = ({ name, className = "w-4 h-4" }) => {
             const icons = {
@@ -493,7 +395,8 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            const handleSubmit = async (e) => {
+            // 【終極修復】拿掉 async/await，避免 Babel 產生 import
+            const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.user || !formData.category || !formData.amount) return;
                 setStatus('loading');
@@ -509,12 +412,14 @@
                     user: formData.user,
                     api_token: apiToken
                 };
-                try {
-                    await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), keepalive: true });
-                    setStatus('success');
-                    setFormData({ user: '', category: '', amount: '', content: '', payment: '' });
-                    setFullDate(getTodayString());
-                } catch (error) { setStatus('error'); }
+                
+                fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), keepalive: true })
+                    .then(() => {
+                        setStatus('success');
+                        setFormData({ user: '', category: '', amount: '', content: '', payment: '' });
+                        setFullDate(getTodayString());
+                    })
+                    .catch(() => setStatus('error'));
             };
 
             const updateField = (name, value) => setFormData(prev => ({ ...prev, [name]: value }));
@@ -1008,7 +913,8 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            const handleSubmit = async (e) => {
+            // 【終極修復】拿掉 async/await，避免 Babel 產生 import
+            const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.category || !formData.user) return;
                 setStatus('loading');
@@ -1026,12 +932,13 @@
                     api_token: apiToken
                 };
 
-                try {
-                    await fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), keepalive: true });
-                    setStatus('success');
-                    setFormData({ user: '', category: '', cup: 1, volume: 330, note: '' });
-                    setFullDate(getTodayString());
-                } catch (error) { setStatus('error'); }
+                fetch(apiUrl, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload), keepalive: true })
+                    .then(() => {
+                        setStatus('success');
+                        setFormData({ user: '', category: '', cup: 1, volume: 330, note: '' });
+                        setFullDate(getTodayString());
+                    })
+                    .catch(() => setStatus('error'));
             };
 
             const adjustCup = (val) => setFormData(p => ({ ...p, cup: Math.max(0, Math.round((p.cup + val) * 10) / 10) }));
@@ -1208,10 +1115,11 @@
             }, [activeTab]);
 
             if (authStatus === 'loading') {
+                const loaderColorClass = activeTab === 'expense' ? 'text-pink-600' : 'text-amber-500';
                 return (
-                    <div className="min-h-screen flex items-center justify-center bg-[#FCE4EC] text-pink-700 font-bold px-10 text-center">
+                    <div className="min-h-screen flex items-center justify-center text-center px-10">
                         <div className="space-y-6">
-                            <Icon name="Loader" className="w-16 h-16 mx-auto text-pink-600" />
+                            <Icon name="Loader" className={`w-16 h-16 mx-auto ${loaderColorClass}`} />
                             <div className="space-y-2">
                                 <p className="tracking-[0.2em] uppercase italic text-xl font-black">正在安全驗證中...</p>
                                 <p className="text-xs text-slate-400 font-medium tracking-widest">正在連線至 Google 伺服器</p>
@@ -1235,7 +1143,6 @@
 
                 return (
                     <div className="min-h-screen flex flex-col">
-                        {/* 未登入狀態下依然允許切換 Tab 來變更驗證畫面的主題風格 */}
                         <header className="w-full max-w-md mx-auto px-4 pt-4 pb-2">
                             <div className="glass-card rounded-3xl p-1.5 flex justify-between items-center shadow-lg border border-white/20 backdrop-blur-md bg-white/40">
                                 <button
@@ -1299,7 +1206,6 @@
 
             return (
                 <div className="min-h-screen flex flex-col">
-                    {/* 頂端切換 Header */}
                     <header className="sticky top-0 z-[150] w-full max-w-md mx-auto px-4 pt-4 pb-2">
                         <div className="glass-card rounded-3xl p-1.5 flex justify-between items-center shadow-lg border border-white/20 backdrop-blur-md bg-white/40">
                             <button
@@ -1325,7 +1231,6 @@
                         </div>
                     </header>
 
-                    {/* 主要內容渲染區 */}
                     <main className="flex-1">
                         {activeTab === 'expense' ? <ExpenseApp apiToken={apiToken} /> : <WineApp apiToken={apiToken} />}
                     </main>
@@ -1341,7 +1246,7 @@
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 for(let registration of registrations) {
                     registration.unregister();
-                    console.log('幽靈快取已成功清除！');
+                    console.log('👻 幽靈快取已成功清除！');
                 }
             });
         }
