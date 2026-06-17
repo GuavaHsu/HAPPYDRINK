@@ -1,4 +1,4 @@
-const CACHE_NAME = 'accounting-pwa-v6';
+const CACHE_NAME = 'accounting-pwa-v7';
 const ASSETS_TO_CACHE = [
   './',
   './index_AIO.html',
@@ -13,7 +13,7 @@ const ASSETS_TO_CACHE = [
   './其他.png',
   'https://unpkg.com/react@18/umd/react.production.min.js',
   'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js',
-  'https://unpkg.com/@babel/standalone/babel.min.js',
+  'https://unpkg.com/@babel/standalone@7.24.7/babel.min.js',
   'https://cdn.tailwindcss.com'
 ];
 
