@@ -395,7 +395,7 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            // 【終極修復】拿掉 async/await，避免 Babel 產生 import
+            // 【終極修復】ExpenseApp 無 async/await
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.user || !formData.category || !formData.amount) return;
@@ -680,7 +680,6 @@
 
             const filteredDataRows = data ? data.filter(row => row && row[3]) : [];
 
-            // 優先從備註判定成員，若備註沒提到任何人，則依據原本是誰喝酒欄位
             const isUserRow = (row, userName, otherName) => {
                 const userCol = row[4] || "";
                 const noteCol = row[8] || "";
@@ -689,11 +688,9 @@
                 return userCol === userName;
             };
 
-            // 分別過濾出庭與珊的資料列
             const tingRows = filteredDataRows.filter(row => isUserRow(row, "庭", "珊"));
             const shanRows = filteredDataRows.filter(row => isUserRow(row, "珊", "庭"));
 
-            // 分別按酒類累加杯數
             const tingCups = tingRows.reduce((acc, row) => {
                 const cat = row[3];
                 const cup = Number(row[4]) || 0;
@@ -913,7 +910,7 @@
 
             React.useEffect(() => { if (status === 'success' && successRef.current) successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, [status]);
 
-            // 【終極修復】拿掉 async/await，避免 Babel 產生 import
+            // 【終極修復】WineApp 也拿掉 async/await，不再產生 import 語句
             const handleSubmit = (e) => {
                 e.preventDefault();
                 if (!formData.category || !formData.user) return;
@@ -1049,7 +1046,6 @@
 
             const expenseApiUrl = 'https://script.google.com/macros/s/AKfycbxyB9Z2sJHxJ3533aqEYnCxMecQShD5nUBBsfYsJpgeM2aPOXTMKU44gwM8IS7M9eYU/exec';
 
-            // 統一金鑰驗證函數 (以記帳 API 進行驗證，金鑰通用)
             const verifyToken = React.useCallback((idToVerify) => {
                 if (!idToVerify) return;
                 const cleanedId = idToVerify.replace(/["']/g, "").trim();
